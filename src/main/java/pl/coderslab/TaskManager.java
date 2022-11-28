@@ -14,7 +14,7 @@ import java.util.Scanner;
 public class TaskManager {
 
     static final String fileName = "tasks.csv";
-    static final String[] options = {"add", "remove", "list", "exit"};
+    static final String[] options = {"1 - add", "2 - remove", "3 - list", "4 - exit"};
     static String[][] tasks;
 
     public static void main(String[] args) throws IOException {
@@ -23,35 +23,34 @@ public class TaskManager {
         Scanner scan = new Scanner(System.in);
 
         showOptions(options);
+        while (scan.hasNextLine()) {
+            String input = scan.nextLine();
 
-        String input = scan.nextLine();
-        if (input.equals("exit")) {
-        saveOnExit(fileName, tasks);
-            System.out.println(ConsoleColors.RED + "Bye, bye");
-            System.exit(0);
+            switch (input) { // todo dodać prostszą opcję wpisywania poleceń (np. 1,2,3,4)
+                case "4":
+                    saveOnExit(fileName, tasks);
+                    System.out.println(ConsoleColors.RED + "Thanks, Bye!");
+                    System.exit(0);
+                    break;
 
+                case "3":
+                    printTasks(tasks);
+                    break;
 
-        } else if (input.equals("list")) {
-            System.out.println("Oto Twoja lista zadań: ");
-            for (int i = 0; i < tasks.length; i++) {
-                System.out.print(i + 1 + ":" + " ");
-                for (int j = 0; j < tasks[i].length; j++) {
-                    System.out.print(tasks[i][j] + " ");
-                }
-                System.out.print("\n");
+                case "1":
+                    addTask();
+                    break;
+
+                case "2":
+                    removeTask(tasks, taskToDelete());
+                    System.out.println("Done");
+                    break;
+
+                default:
+                    System.out.println("Wrong option entered");
             }
+            showOptions(options);
 
-        } else if (input.equals("add")) {
-            addTask();
-            System.out.println("done");
-
-        } else if (input.equals("remove")) {
-            removeTask(tasks, taskToDelete());
-            System.out.println("done");
-
-        } else {
-            System.out.println("Wprowadziłeś nieprawidłową opcją. Do widzenia");
-            System.exit(0);
         }
 
     }
@@ -60,6 +59,7 @@ public class TaskManager {
     public static void showOptions(String[] arr) {
         System.out.println(ConsoleColors.BLUE);
         System.out.println("Please select an option, and press 'enter' :  " + ConsoleColors.RESET);
+
         for (String option : arr) {
             System.out.println(option);
 
@@ -71,7 +71,7 @@ public class TaskManager {
 
         Path fileLocation = Paths.get(fileName);
         if (!Files.exists(fileLocation)) {
-            System.out.println("Plik nie istnieje");
+            System.out.println("File not found");
             System.exit(0);
         }
 
@@ -106,10 +106,10 @@ public class TaskManager {
         String importance = scan.nextLine();
 
         tasks = Arrays.copyOf(tasks, tasks.length + 1);
-        tasks[tasks.length-1] = new String[3];
-        tasks[tasks.length-1][0] = desc;
-        tasks[tasks.length-1][1] = dueDate;
-        tasks[tasks.length-1][2] = importance;
+        tasks[tasks.length - 1] = new String[3];
+        tasks[tasks.length - 1][0] = desc;
+        tasks[tasks.length - 1][1] = dueDate; // todo walidacja poprawności daty
+        tasks[tasks.length - 1][2] = importance; // todo walidacja poprawności wartości
 
     }
 
@@ -123,9 +123,8 @@ public class TaskManager {
         try {
             numToDel = Integer.parseInt(numberToDelete);
 
-        } catch (NumberFormatException e )
-        {
-            System.out.println("nieprawidłowa liczba, wprowadź ponownie"); // todo co jeśli będzie "0"?
+        } catch (NumberFormatException e) {
+            System.out.println("nieprawidłowa liczba, wprowadź ponownie");
             scan.nextLine();
         }
 
@@ -133,8 +132,7 @@ public class TaskManager {
             System.out.println("Nie ma takiego elementu w tablicy");
         }
 
-        return numToDel;
-
+        return numToDel - 1;
 
     }
 
@@ -144,16 +142,26 @@ public class TaskManager {
             if (index < tab.length) {
                 tasks = ArrayUtils.remove(tab, index);
             }
-        } catch (ArrayIndexOutOfBoundsException e) {
+        } catch (IndexOutOfBoundsException e) {
             System.out.println("Nie ma takiego elementu w tablicy");
         }
 
+    }
 
 
+    public static void printTasks(String[][] tab) {
+
+        for (int i = 0; i < tab.length; i++) {
+            System.out.print(i + 1 + ":" + " ");
+            for (int j = 0; j < tab[i].length; j++) {
+                System.out.print(tasks[i][j] + " ");
+            }
+            System.out.print("\n");
+        }
 
     }
 
-    public static void saveOnExit (String fileName, String[][] tab) {
+    public static void saveOnExit(String fileName, String[][] tab) {
         Path fileLocation = Paths.get(fileName);
 
         String[] lines = new String[tasks.length];
@@ -170,6 +178,6 @@ public class TaskManager {
         }
     }
 
-    }
+}
 
 
