@@ -1,6 +1,8 @@
 package pl.coderslab;
 
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,8 +26,11 @@ public class TaskManager {
 
         String input = scan.nextLine();
         if (input.equals("exit")) {
-            System.out.println("Do zobaczenia!");
+        saveOnExit(fileName, tasks);
+            System.out.println(ConsoleColors.RED + "Bye, bye");
             System.exit(0);
+
+
         } else if (input.equals("list")) {
             System.out.println("Oto Twoja lista zadań: ");
             for (int i = 0; i < tasks.length; i++) {
@@ -41,8 +46,8 @@ public class TaskManager {
             System.out.println("done");
 
         } else if (input.equals("remove")) {
-            System.out.println("funkcja usuwania pozycji z terminarza");
-            System.exit(0);
+            removeTask(tasks, taskToDelete());
+            System.out.println("done");
 
         } else {
             System.out.println("Wprowadziłeś nieprawidłową opcją. Do widzenia");
@@ -108,5 +113,63 @@ public class TaskManager {
 
     }
 
+    public static int taskToDelete() {
+        Scanner scan = new Scanner(System.in);
+        System.out.println("Please select number to remove: ");
 
-}
+        String numberToDelete = scan.nextLine();
+
+        int numToDel = 0;
+        try {
+            numToDel = Integer.parseInt(numberToDelete);
+
+        } catch (NumberFormatException e )
+        {
+            System.out.println("nieprawidłowa liczba, wprowadź ponownie"); // todo co jeśli będzie "0"?
+            scan.nextLine();
+        }
+
+        if (numToDel == 0) {
+            System.out.println("Nie ma takiego elementu w tablicy");
+        }
+
+        return numToDel;
+
+
+    }
+
+    public static void removeTask(String[][] tab, int index) {
+
+        try {
+            if (index < tab.length) {
+                tasks = ArrayUtils.remove(tab, index);
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.out.println("Nie ma takiego elementu w tablicy");
+        }
+
+
+
+
+    }
+
+    public static void saveOnExit (String fileName, String[][] tab) {
+        Path fileLocation = Paths.get(fileName);
+
+        String[] lines = new String[tasks.length];
+
+        for (int i = 0; i < tab.length; i++) {
+            lines[i] = String.join(",", tab[i]);
+        }
+
+        try {
+            Files.write(fileLocation, Arrays.asList(lines));
+        } catch (IOException e) {
+            e.printStackTrace();
+
+        }
+    }
+
+    }
+
+
